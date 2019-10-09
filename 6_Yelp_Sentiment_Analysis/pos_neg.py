@@ -58,9 +58,10 @@ positivity = step_3pos.map(lambda x:(x[0], math.log(float(x[1][1])/pos_review_co
     - math.log(float(x[1][0])/all_review_count)))
 
 sorted_pos = positivity.sortBy(lambda x:x[1], ascending = False)
+sorted_pos.saveAsTextFile('si618_hw6_theoliao_posreview.csv')
 
 negativity = step_3neg.map(lambda x:(x[0], math.log(float(x[1][1])/neg_review_count) \
     - math.log(float(x[1][0])/all_review_count)))
 sorted_neg = negativity.sortBy(lambda x:x[1], ascending = False)
-
+sorted_neg.saveAsTextFile('si618_hw6_theoliao_negreview.csv')
 
