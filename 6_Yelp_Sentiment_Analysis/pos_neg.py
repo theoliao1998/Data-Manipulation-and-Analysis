@@ -7,7 +7,7 @@ import re
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext
 
-conf = SparkConf().setAppName("si618_hw5")
+conf = SparkConf().setAppName("si618_lec6")
 sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
 
