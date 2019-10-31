@@ -1,0 +1,116 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# SI 618 Homework 7
+
+# Part 1 (40 points)
+
+## Question 1: Load country data (5 points)
+
+First the provided TSV data file is loaded into R using the **read.table()** function. Display the first 15 rows
+of the data frame:
+
+```{r echo=FALSE}
+data <- read.table(file="countrydata_withregion.tsv", sep="\t",quote="", header=TRUE)
+data[1:15,1:4]
+```
+
+## Question 2: Scatter plot of log transformed data (5 points)
+
+Logarithms (base 2) of the area and the population of each country are computed and used to produce the
+following scatter plot using the **qplot()** function. Use **{r echo=FALSE, fig.width=7}** for all of the plots.
+
+```{r echo=FALSE, fig.width=7}
+library(ggplot2)
+qplot(log2(area), log2(population), data=data, xlab="Log base 2 of the area", ylab="Log base 2 of the population")
+```
+
+## Question 3: Data aggregation by region (15 points)
+
+The areas and populations of all countries in a region are summed up using the **aggregate()** function,
+respectively. Then the following two pie charts are created using the **pie()** function.
+
+```{r echo=FALSE, fig.width=7}
+agg = aggregate(list(data$area, data$population), by=list(data$region), FUN=sum, na.rm=TRUE)
+pie(agg[,2],labels=agg[,1],main="Area of Regions")
+```
+
+```{r echo=FALSE, fig.width=7}
+pie(agg[,3],labels=agg[,1],main="Population of Regions")
+```
+
+## Question 4: Visualization of Population per sq km of Regions (15 points)
+
+A new data frame is created to contain the population per sq km of each region using the **data.frame()**
+function. The data frame is then sorted by population per sq km in decreasing order with the help of the
+**reorder()** function. Finally, the following bar plot is created using the **qplot()** function with **geom=“bar”**.
+In order to rotate the x-axis labels, add **+ theme(axis.text.x = element_text(angle = 60, hjust =
+1))** at the end of the **qplot()** function call.
+
+```{r echo=FALSE, fig.width=7}
+population_per_sq = data.frame(region = agg[,1],
+                               value = agg[,3]/agg[,2])
+population_per_sq$region <- reorder(population_per_sq$region, X=-population_per_sq$value, order=is.ordered(population_per_sq))
+qplot(region,value,data=population_per_sq,geom = "col",ylab="Population per sq km of Regions", xlab="Region",)+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+
+# Part 2 (60 points)
+## Question 5: Load yelp data & generate summary (10 points)
+
+Load the TSV data file: businessdata.tsv into a R data frame using the **read.table()** function. The city, state
+and main_category columns should be converted to factors. Then listwise deletion (http://en.wikipedia.org/wiki/Listwise_deletion) is applied to remove records with missing data (use the **na.omit()** function). Then
+the data.frame is converted to a data.table. Here is the summary of the data table:
+
+```{r echo=FALSE}
+data <- read.table(file="businessdata.tsv", sep="\t", header=TRUE,fill=TRUE,quote="", colClasses=c("character","factor","factor","numeric","numeric","factor"))
+df <- data
+data <- na.omit(data)
+summary(data)
+```
+
+## Question 6: Histogram of Star Rating (10 points)
+
+The Histogram of star ratings is plotted with the **qplot()** or **ggplot()** function. The actual counts plot is
+shown. (Use **binwidth=1**)
+
+```{r echo=FALSE, fig.width=7}
+qplot(data=data, mapping=aes(x=stars, fill=state),geom="histogram",binwidth=1,xlab="Stars",main="Histograms of Star Ratings")+ facet_grid(. ~ state)
+```
+
+## Question 7: Histograms of Review Counts (10 points)
+
+Histograms of review counts are plotted with the **qplot()** or **ggplot()** function. (Use **binwidth=10**)
+
+```{r echo=FALSE, fig.width=7}
+qplot(data=data, mapping=aes(x=review_count),geom="histogram",binwidth=10,xlab="Review Counts",main="Histograms of Review Counts", alpha=0.8, show.legend = F)
+```
+
+We can see that the distribution of review counts has a long tail. To zoom in on the bars to the left of the
+200 mark, we use the **data.table** syntax or the **subset()** function to select just the data with review count
+<= 200. And then plot the histogram again with **binwidth=1**.
+
+```{r echo=FALSE, fig.width=7}
+qplot(data=data[data$review_count<=200,], mapping=aes(x=review_count),geom="histogram",binwidth=1,xlab="Review Counts",main="Histograms of Review Counts (Filtered)", alpha=0.8, show.legend = F)
+```
+
+## Question 8: Boxplot of Star Ratings by States (10 points)
+
+```{r echo=FALSE, fig.width=7}
+qplot(data=data, mapping=aes(x=state,y=stars,fill=state),geom="boxplot",ylab="Stars",main="Star Ratings by States")
+```
+
+## Question 9: Bar Chart of Number of Businesses by State (10 points)
+
+The states should be orderd by descreasing height of bars. Use the **reorder()** function.
+
+```{r echo=FALSE, fig.width=7}
+data$state <- reorder(data$state,X=data$state, FUN=length)
+data$state <- factor(data$state, levels=rev(levels(data$state)))
+qplot(data=data,mapping=aes(x=state),geom="bar",ylab="State",alpha=0.8,show.legend=F)
+```
