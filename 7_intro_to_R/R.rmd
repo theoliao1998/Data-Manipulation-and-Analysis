@@ -68,7 +68,7 @@ and main_category columns should be converted to factors. Then listwise deletion
 the data.frame is converted to a data.table. Here is the summary of the data table:
 
 ```{r echo=FALSE}
-data <- read.table(file="businessdata.tsv", sep="\t", header=TRUE,fill=TRUE,quote="", colClasses=c("character","factor","factor","numeric","numeric","factor"))
+data <- read.table(file="businessdata.tsv", sep="\t", header=TRUE,fill=TRUE,quote="", comment.char="", colClasses=c("character","factor","factor","numeric","numeric","factor"))
 df <- data
 data <- na.omit(data)
 summary(data)
